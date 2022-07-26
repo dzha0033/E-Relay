@@ -1,0 +1,114 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="assets/css/layui.css">
+    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="icon" href="/favicon.ico">
+    <title>快递e栈管理后台</title>
+</head>
+<body class="login-wrap">
+<div class="login-container">
+    <h3>快递e栈后台管理</h3>
+    <form class="login-form" action="index.html">
+        <div class="input-group" id="un">
+            <input type="text" id="username" class="input-field" required>
+            <label for="username" class="input-label">
+                    <span class="label-title">用户名
+                        <span class="label-title" id="nametips" style="color: red; visibility: hidden"
+                        >&nbsp（用户名长度在3～10）</span>
+                    </span>
+            </label>
+        </div>
+        <div class="input-group" id="psw">
+            <input type="password" id="password" class="input-field" required>
+            <label for="password" class="input-label">
+                <span class="label-title">密码 <span id="pswtips"
+                                                   style="color: red; visibility: hidden">&nbsp（密码长度在5～16）</span>
+                </span>
+            </label>
+        </div>
+        <button type="button" class="login-button" id = "login" disabled>登录<i class="ai ai-enter"></i></button>
+    </form>
+</div>
+</body>
+<script src="assets/layui.js"></script>
+
+<script src="js/index.js" data-main="login"></script>
+<script src="js/login.js" data-main="login"></script>
+<script src="../qrcode/jquery2.1.4.js"></script>
+<script src="../layer/layer.js"></script>
+<script>
+    var status = 'false';
+    $(function () {
+        $("#username").on('mouseleave',function () {
+            var username = $("#username").val();
+            if ((username.length < 3 || username.length > 10)) {
+                status = 'false';
+                $("#nametips").css({
+                    'visibility': 'visible'
+                });
+            }
+
+        })
+    })
+    $(function () {
+        $("#username").on('blur', (function () {
+            var username = $("#username").val();
+            if ((username.length > 2 && username.length < 11)){
+                status = 'true';
+                $("#nametips").css({
+                    'visibility': 'hidden'
+                })
+            }
+
+        }))
+    })
+    $(function () {
+        $("#password").on('mouseleave',function () {
+            var password = $("#password").val();
+            if (password.length <= 4 || password.length > 16) {
+                $("#pswtips").css({
+                    'visibility': 'visible'
+                })
+            }
+
+        })
+    })
+
+    $(function () {
+        $("#password").on('blur', function () {
+            var password = $("#password").val();
+            if (password.length > 4 && password.length < 17)
+                $("#pswtips").css({
+                    'visibility': 'hidden'
+                })
+            if(status =='true'){
+                $('#login').removeAttr('disabled');
+            }
+
+        })
+    })
+
+    $(function () {
+        $(".login-button").click(function () {
+            var username = $("#username").val();
+            var password = $("#password").val();
+            var windowId = layer.load();
+            $.post("login.do", {username: username, password: password}, function (data) {
+
+                layer.close(windowId);
+                layer.msg(data.result);
+                if (data.status == 0) {
+                    //跳转到主页
+                    location.assign("index.html");
+                }
+                //
+            }, "JSON");
+
+        });
+    });
+</script>
+</html>

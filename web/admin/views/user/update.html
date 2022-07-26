@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../../css/reset.css"/>
+    <link rel="stylesheet" type="text/css" href="../../css/add.css"/>
+</head>
+<body>
+<div id="app">
+    <div class="header">
+        <span>修改用户信息</span>
+    </div>
+    <div class="content">
+        <table>
+            <tr>
+                <td class="text-right">手机号码</td>
+                <td class="content_right"><input class="input inline-input" placeholder="请输入手机号码" id="phone"/>
+                    <span class="btn btn-info" id="find">立即查找</span></td>
+            </tr>
+        </table>
+    </div>
+
+
+    <div class="header">
+        <span>查找信息如下</span>
+    </div>
+    <div class="content">
+        <table>
+            <tr>
+                <td class="text-right">用户名</td>
+                <td class="content_right"><input class="input" placeholder="请输入姓名"></td>
+            </tr>
+            <tr>
+                <td class="text-right">手机号</td>
+                <td class="content_right"><input class="input" placeholder="请输入手机号"></td>
+            </tr>
+            <tr>
+                <td class="text-right">身份证号码</td>
+                <td class="content_right"><input class="input" placeholder="请输入身份证"></td>
+            </tr>
+            <tr>
+                <td class="text-right">密码</td>
+                <td class="content_right"><input class="input" placeholder="请输入密码"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td class="content_right"><span class="btn btn-info" id="update">立即修改</span> <span class="btn">重置</span>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+<script src="/qrcode/jquery2.1.4.js"></script>
+<script src="/layer/layer.js"></script>
+<script>
+    $(".header:eq(1),.content:eq(1)").hide();
+    let userId = null;
+    $(function () {
+        $("#find").click(function () {
+            let windowId = layer.load();
+            let phone = $("#phone").val();
+            $.getJSON("/users/find.do", {phone: phone}, function (data) {
+                layer.close(windowId);
+                layer.msg(data.result);
+                if (data.status == 0) {
+                    $(".header:eq(1),.content:eq(1)").fadeIn(1000);
+                    userId = data.data.id;
+                    $("input:eq(1)").val(data.data.name);
+                    $("input:eq(2)").val(data.data.phone);
+                    $("input:eq(3)").val(data.data.idCard);
+                    $("input:eq(4)").val(data.data.password);
+                }
+            })
+        });
+
+        $("#update").click(function () {
+            let windowId = layer.load();
+            let name = $("input:eq(1)").val();
+            let phone = $("input:eq(2)").val();
+            let IDCard = $("input:eq(3)").val();
+            let password = $("input:eq(4)").val();
+
+            let user = {
+                id: userId,
+                name: name,
+                phone: phone,
+                IDCard: IDCard,
+                password: password
+            };
+
+            if (username.length < 2) {
+                layer.close(windowId);
+                layer.msg("昵称长度不可小于2");
+            } else if (phone.length != 9) {
+                layer.close(windowId);
+                layer.msg("电话格式错误！");
+            } else if (IDCard.length != 18) {
+                layer.close(windowId);
+                layer.msg("生份证号错误！");
+            } else {
+                $.getJSON("/users/update.do", user, function (data) {
+                    layer.close(windowId);
+                    layer.msg(data.result)
+
+                    if (data.status == 0) {
+                        //修改成功的
+                        $(".header:eq(1),.content:eq(1)").hide();
+                    }
+                })
+            }
+        });
+    });
+</script>
+</html>
